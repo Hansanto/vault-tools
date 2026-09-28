@@ -66,7 +66,7 @@ If one day it is possible, we will use it to avoid the use of a `docker-compose`
 To build the project:
 
 ```shell
-./gradlew assemble
+./gradlew kotlinNpmInstall && ./gradlew assemble
 ```
 
 The final executables will be located at:
