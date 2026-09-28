@@ -1,0 +1,30 @@
+name: playwright-info
+description: Get Playwright information from the project
+
+outputs:
+  version:
+    description: Playwright version
+    value: '${{ steps.playwright-version.outputs.version }}'
+  browsers:
+    description: Playwright browsers
+    value: '${{ steps.playwright-browsers.outputs.browsers }}'
+
+runs:
+  using: composite
+  steps:
+    - name: 📝 Get Playwright version
+      id: playwright-version
+      shell: bash
+      run: |
+        PLAYWRIGHT_VERSION=$(grep -oP 'playwright\s*=\s*"\K[^"]+' gradle/libs.versions.toml)
+        echo "version=$PLAYWRIGHT_VERSION" >> $GITHUB_OUTPUT
+
+    - name: 📝 Get Playwright browsers
+      id: playwright-browsers
+      shell: bash
+      run: |
+        # Format can be:
+        # chromium firefox
+        # chromium,firefox
+        # chromium, firefox
+        echo "browsers=chromium" >> $GITHUB_OUTPUT

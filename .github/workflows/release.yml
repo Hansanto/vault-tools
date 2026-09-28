@@ -1,0 +1,83 @@
+name: release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  validate-wrapper:
+    uses: ./.github/workflows/gradle-validation.yml
+
+  release:
+    needs: [ validate-wrapper ]
+    runs-on: ubuntu-24.04
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+
+  publish:
+    needs: [ validate-wrapper, release ]
+    runs-on: macos-latest
+    if: ${{ needs.release.outputs.release_created }}
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v6
+
+      - name: 🙈 Get gradle dependencies
+        id: restore-cache-gradle
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/yarn
+            ~/.gradle/nodejs
+            ~/.konan
+          key: >-
+            ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle', '**/settings.gradle', '**/build.gradle.kts', '**/settings.gradle.kts', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      - name: ⚙️ Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          java-version-file: .sdkmanrc
+
+      - name: 🛠 Build
+        run: ./gradlew kotlinNpmInstall && ./gradlew assemble
+
+      - name: 📄 Get project name
+        id: project-info
+        run: |
+          PROJECT_NAME=$(grep 'rootProject.name' settings.gradle.kts | sed 's/.*= *"\(.*\)"/\1/')
+          echo "project_name=$PROJECT_NAME" >> $GITHUB_OUTPUT
+
+      - name: 🚀 Publish
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.release.outputs.tag_name }}
+          files: |
+            app/build/bin/**/releaseExecutable/*
+            app/build/libs/${{ steps.project-info.outputs.project_name }}*.jar
+            app/build/dist/js/productionExecutable/**/*
+
+      - name: 🙈 Save gradle dependencies
+        if: always() && steps.restore-cache-gradle.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/yarn
+            ~/.gradle/nodejs
+            ~/.konan
+          key: >-
+            ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle', '**/settings.gradle', '**/build.gradle.kts', '**/settings.gradle.kts', '**/gradle-wrapper.properties') }}

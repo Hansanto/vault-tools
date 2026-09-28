@@ -1,0 +1,12 @@
+.gradle
+build
+reports
+dokka
+
+.idea
+*.iml
+.run
+*.tmp
+
+kotlin-js-store
+.kotlin

@@ -1,0 +1,69 @@
+name: build
+
+on:
+  push:
+    branches-ignore:
+      - "v*" # Skip tags
+  workflow_dispatch:
+    inputs:
+      upload-report:
+        type: boolean
+        description: 'Upload the test report'
+        required: false
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-wrapper:
+    uses: ./.github/workflows/gradle-validation.yml
+
+  build:
+    needs: [ validate-wrapper ]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v6
+
+      - name: 🙈 Get gradle dependencies
+        id: restore-cache-gradle
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/yarn
+            ~/.gradle/nodejs
+            ~/.konan
+          key: >-
+            ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle', '**/settings.gradle', '**/build.gradle.kts', '**/settings.gradle.kts', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      - name: ⚙️ Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          java-version-file: .sdkmanrc
+
+      - name: 🧹 Check format
+        run: ./gradlew ktlintCheck
+
+      - name: 🧹 Check code style
+        run: ./gradlew detektAll
+
+      - name: 🛠 Build
+        run: ./gradlew kotlinNpmInstall && ./gradlew assemble
+
+      - name: 🙈 Save gradle dependencies
+        if: always() && steps.restore-cache-gradle.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/yarn
+            ~/.gradle/nodejs
+            ~/.konan
+          key: >-
+            ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle', '**/settings.gradle', '**/build.gradle.kts', '**/settings.gradle.kts', '**/gradle-wrapper.properties') }}

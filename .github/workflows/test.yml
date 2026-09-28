@@ -1,0 +1,125 @@
+name: test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-wrapper:
+    uses: ./.github/workflows/gradle-validation.yml
+
+  playwright-version:
+    runs-on: ubuntu-24.04
+    outputs:
+      playwright-version: ${{ steps.playwright-info.outputs.version }}
+      playwright-browsers: ${{ steps.playwright-info.outputs.browsers }}
+    steps:
+      - name: ⬇️ Checkout the latest code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: 📝 Get Playwright info
+        id: playwright-info
+        uses: ./.github/actions/playwright-info
+
+  test:
+    needs: [ validate-wrapper, playwright-version ]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v6
+
+      - name: 📝 Get playwright cache key
+        id: playwright-info
+        env:
+          PLAYWRIGHT_BROWSERS: ${{ needs.playwright-version.outputs.playwright-browsers }}
+          PLAYWRIGHT_VERSION: ${{ needs.playwright-version.outputs.playwright-version }}
+        run: |
+          # 1. Remove leading/trailing spaces
+          # 2. Replace several spaces, followed by comma, followed by several spaces
+          normalized_browsers=$(
+            echo "$PLAYWRIGHT_BROWSERS" |
+            sed -E 's/^[[:space:]]+|[[:space:]]+$//g; s/[[:space:]]*[,][[:space:]]*/ /g'
+          );
+
+          # Used for installation (chromium firefox)
+          echo "browsers_space=$normalized_browsers" >> "$GITHUB_OUTPUT";
+          echo "version=$PLAYWRIGHT_VERSION" >> "$GITHUB_OUTPUT";
+
+          # Used for cache key (chromium_firefox)
+          browsers_underscore=${normalized_browsers// /_}
+          
+          cache_key="${{ runner.os }}-playwright\
+          -$PLAYWRIGHT_VERSION\
+          -$browsers_underscore";
+          echo "cache_key=$cache_key" >> "$GITHUB_OUTPUT";
+
+      - name: 🙈 Get gradle dependencies
+        id: restore-cache-gradle
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/yarn
+            ~/.gradle/nodejs
+            ~/.konan
+          key: >-
+            ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle', '**/settings.gradle', '**/build.gradle.kts', '**/settings.gradle.kts', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      - name: 🙈 Get caching Playwright
+        id: restore-cache-playwright
+        uses: actions/cache/restore@v5
+        with:
+          key: ${{ steps.playwright-info.outputs.cache_key }}
+          path: |
+            ~/.cache/ms-playwright
+
+      - name: Docker Compose up
+        run: docker compose up -d
+
+      - name: ⚙️ Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          java-version-file: .sdkmanrc
+
+      - name: 🧪 Install Playwright
+        if: steps.restore-cache-playwright.outputs.cache-hit != 'true'
+        run: >-
+          npx playwright@${{ steps.playwright-info.outputs.version }}
+          install --with-deps --only-shell ${{ steps.playwright-info.outputs.browsers_space }}
+
+      - name: 🧪 Test
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1 # https://playwright.dev/java/docs/browsers#skip-browser-downloads
+        run: ./gradlew allTests --max-workers=1
+
+      - name: 🙈 Save caching Playwright
+        id: save-cache-playwright
+        if: always() && steps.restore-cache-playwright.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          key: ${{ steps.playwright-info.outputs.cache_key }}
+          # https://playwright.dev/docs/browsers#managing-browser-binaries
+          path: |
+            ~/.cache/ms-playwright
+
+      - name: 🙈 Save gradle dependencies
+        if: always() && steps.restore-cache-gradle.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.gradle/yarn
+            ~/.gradle/nodejs
+            ~/.konan
+          key: >-
+            ${{ runner.os }}-gradle-${{ hashFiles('**/build.gradle', '**/settings.gradle', '**/build.gradle.kts', '**/settings.gradle.kts', '**/gradle-wrapper.properties') }}

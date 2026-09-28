@@ -1,0 +1,43 @@
+services:
+  vault:
+    image: openbao/openbao:2.5.3
+    container_name: vault
+    ports:
+      - "8200:8200"
+    environment:
+      - BAO_LOG_LEVEL=debug
+      - BAO_DEV_ROOT_TOKEN_ID=root
+      - BAO_DEV_LISTEN_ADDRESS=0.0.0.0:8200
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - keycloak
+    extra_hosts:
+      - "localhost:host-gateway"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6
+    container_name: keycloak
+    command: start-dev --import-realm --http-relative-path=/
+    ports:
+      - "8080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: true
+      KC_METRICS_ENABLED: false
+      KC_LOG_LEVEL: info
+    healthcheck:
+      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200 OK'" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 30s
+    volumes:
+      - ./common-test/src/commonMain/resources/configuration/keycloak/realm.json:/opt/keycloak/data/import/realm.json
+    networks:
+      - keycloak
+
+networks:
+  keycloak:
+    driver: bridge

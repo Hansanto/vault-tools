@@ -1,0 +1,163 @@
+{
+  "": {
+    "deep/nested/path/multiple/levels": {
+      "app": {
+        "database": {
+          "primary": {
+            "password": "value",
+            "replica": {
+              "password": "value"
+            }
+          }
+        },
+        "security": {
+          "encryption_key": "value",
+          "secrets": {
+            "backup": {
+              "recovery_code": "value_recovery"
+            },
+            "value": "deeply_nested_value"
+          }
+        }
+      }
+    },
+    "edge_cases": {
+      "array_value": [
+        "value",
+        "another_value",
+        "value_item"
+      ],
+      "boolean_value": true,
+      "null_value": null,
+      "number_value": 42,
+      "object_value": {
+        "inner_value": "even_deeper",
+        "value": "deep_nested"
+      },
+      "vAlUe": "MixedCaseSecret",
+      "Value": "CaseSensitiveData",
+      "VALUE": "UPPERCASE_SECRET"
+    },
+    "identical_values": {
+      "api_key": "value",
+      "password": "value",
+      "secret_ref": "value",
+      "token": "value"
+    },
+    "key_contains_value": {
+      "auth_value_key": "credentials",
+      "db_value_param": "connection_string",
+      "secret_value": "data",
+      "value": "secret_content",
+      "value_config": "settings"
+    },
+    "key_named_value": {
+      "metadata": {
+        "value": "nested_secret_content"
+      },
+      "value": "this_is_the_actual_secret"
+    },
+    "partial_matches": {
+      "config": "my_value",
+      "data": "value123",
+      "description": "value_modified",
+      "notes": "contains_value_inside",
+      "reference": "prefix_value_suffix"
+    }
+  },
+  "namespace1": {
+    "duplicate_secrets": {
+      "api_key": "value",
+      "cache_token": "value",
+      "database_password": "value"
+    },
+    "key_name_search": {
+      "custom_value_field": "data3",
+      "prefix_value": "data4",
+      "value_suffix": "data5",
+      "valueA": "data1",
+      "valueB": "data2"
+    },
+    "payment/nested": {
+      "paypal": {
+        "credentials": {
+          "client_id": "value",
+          "client_secret": "value"
+        }
+      }
+    },
+    "services": {
+      "jwt": {
+        "private_key": {
+          "value": "private_key_content"
+        },
+        "secret": "value"
+      },
+      "ldap": {
+        "bind_password": "value",
+        "settings": {
+          "search_filter": "value_filter"
+        }
+      }
+    },
+    "similar_but_different": {
+      "field1": "value_prod",
+      "field2": "value_dev",
+      "field3": "value_test",
+      "field4": "myvalue",
+      "field5": "value_123_config"
+    }
+  },
+  "namespace2": {
+    "without_value": {
+      "api_key": "data1",
+      "config": "data2"
+    },
+    "complex_key_search": {
+      "api_value": "endpoint_secret",
+      "contains_value_in_name": "hidden_secret",
+      "value": "root_secret",
+      "value_pair": "paired_secret",
+      "valueOverride": "override_secret"
+    },
+    "mixed_case_scenario": {
+      "data": "VALUE_UPPERCASE_HERE",
+      "payload": "some_value_here",
+      "vAlUe": "mixed_case_content",
+      "Value": "exact_case_match",
+      "VALUE": "all_uppercase_content"
+    },
+    "partial_content_test": {
+      "dev_config": "my_value_v3",
+      "feature_toggle": "enable_value_flag",
+      "prod_config": "my_value_v1",
+      "staging_config": "my_value_v2"
+    },
+    "secrets/database": {
+      "mongodb": {
+        "credentials": {
+          "replicas": {
+            "replica1": "value",
+            "replica2": "value"
+          },
+          "value": "mongodb_secret"
+        }
+      },
+      "postgres": {
+        "connection": {
+          "pool": {
+            "secret": "value"
+          },
+          "url": "value_postgres_url"
+        },
+        "password": "value"
+      }
+    },
+    "test_identical_values": {
+      "backup_token": "value",
+      "encryption_key": "value",
+      "password": "value",
+      "username": "value"
+    }
+  }
+}
