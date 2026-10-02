@@ -16,7 +16,7 @@ services:
       - "localhost:host-gateway"
 
   keycloak:
-    image: quay.io/keycloak/keycloak:26.6@sha256:0aae0de7fca85525f727d3354df17896092de8bb26ae4c12d89c77e5df8cbce4
+    image: quay.io/keycloak/keycloak:26.8@sha256:b0f60d489d51c5d113390bdf5461d4c06e6051be026c05549f2e1e10ec352bcc
     container_name: keycloak
     command: start-dev --import-realm --http-relative-path=/
     ports:
