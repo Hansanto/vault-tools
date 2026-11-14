@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.0.1](https://github.com/Hansanto/vault-tools/compare/v1.0.0...v1.0.1) (2026-11-14)
+
+
+### Bug Fixes
+
+* **deps:** update dependency com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin to v2.3.12 ([#3](https://github.com/Hansanto/vault-tools/issues/3)) ([78ebc93](https://github.com/Hansanto/vault-tools/commit/78ebc939bd2514be9fa62182784576d8f6cbc0c1))
+* **deps:** update dependency com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin to v2.3.13 ([#31](https://github.com/Hansanto/vault-tools/issues/31)) ([c9a14e5](https://github.com/Hansanto/vault-tools/commit/c9a14e5045e2b62c2125f1301ced459141826578))
+* **deps:** update dependency com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin to v2.3.14 ([#42](https://github.com/Hansanto/vault-tools/issues/42)) ([e6a28ab](https://github.com/Hansanto/vault-tools/commit/e6a28abbce526be4329abf029113777657eeeed4))
+* **deps:** update dependency org.slf4j:slf4j-simple to v2.0.20 ([#5](https://github.com/Hansanto/vault-tools/issues/5)) ([0590956](https://github.com/Hansanto/vault-tools/commit/0590956578c726bcd55f1e6dc1f3dc1915f1a30c))
+* **deps:** update kotest to v6.2.5 ([#6](https://github.com/Hansanto/vault-tools/issues/6)) ([fa1e0cb](https://github.com/Hansanto/vault-tools/commit/fa1e0cb337db247cdd57220873d707430d482a22))
+* **deps:** update kotest to v6.2.6 ([#24](https://github.com/Hansanto/vault-tools/issues/24)) ([54e8488](https://github.com/Hansanto/vault-tools/commit/54e84882c296b77f488099ce061fccd422bd7358))
+* **deps:** update kotest to v6.2.7 ([#39](https://github.com/Hansanto/vault-tools/issues/39)) ([ac0069b](https://github.com/Hansanto/vault-tools/commit/ac0069b87ed6c1ab853554e3ea352309d3997640))
+* **deps:** update kotlinx-coroutines monorepo to v1.11.0 ([#12](https://github.com/Hansanto/vault-tools/issues/12)) ([766a78a](https://github.com/Hansanto/vault-tools/commit/766a78a26b02f7f1eba83dbc6c8e78075d2b7f64))
+* **deps:** update ktor monorepo to v3.6.0 ([#13](https://github.com/Hansanto/vault-tools/issues/13)) ([98981de](https://github.com/Hansanto/vault-tools/commit/98981de8b602947dccf59624a8a26d7fa5e3840e))
+* **deps:** update ktor monorepo to v3.6.1 ([#30](https://github.com/Hansanto/vault-tools/issues/30)) ([a510bd0](https://github.com/Hansanto/vault-tools/commit/a510bd050ae7c66f2cc5339754f641653f0bcc2a))
+* **deps:** update mordant to v3.1.1 ([#33](https://github.com/Hansanto/vault-tools/issues/33)) ([1bbee30](https://github.com/Hansanto/vault-tools/commit/1bbee30e6b7158cafa487224bc6355976e289324))
+* **deps:** update resources to v0.16.3 ([#41](https://github.com/Hansanto/vault-tools/issues/41)) ([cf529fc](https://github.com/Hansanto/vault-tools/commit/cf529fc70121ea95b54337acb89590f8e9406f9f))
+
 ## 1.0.0 (2026-09-28)
 
 
